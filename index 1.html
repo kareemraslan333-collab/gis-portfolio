@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كريم رسلان | GIS Specialist Portfolio</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Orbitron:wght@600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --accent: #00d2ff;
+            --bg-dark: #02040a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --text-gray: #b0b3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+        body { background-color: var(--bg-dark); color: #fff; font-family: 'Cairo', sans-serif; overflow-x: hidden; }
+
+        /* خلفية فائقة التفاعل */
+        #particles-js { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at center, #0a192f 0%, #02040a 100%); }
+
+        /* منيو احترافي */
+        nav { position: fixed; top: 25px; right: 50px; display: flex; gap: 15px; z-index: 2000; }
+        .nav-link {
+            color: #fff; text-decoration: none; font-weight: 900; padding: 12px 30px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 1.1rem; border-radius: 50px;
+        }
+        .nav-link:hover { color: var(--accent); text-shadow: 0 0 15px var(--accent); transform: scale(1.1); }
+
+        /* الهيرو */
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif; font-size: clamp(3.5rem, 12vw, 8.5rem); font-weight: 900;
+            background: linear-gradient(to bottom, #fff 30%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 30px rgba(0,210,255,0.3));
+        }
+
+        /* شبكة الخرائط (9 خرائط مع التحليل تحتها) */
+        .section-title { text-align: center; margin: 80px 0 40px; font-size: 2.5rem; color: var(--accent); font-weight: 900; }
+        .maps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; padding: 0 8% 100px; }
+        
+        .map-card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: 0.4s; }
+        .map-card:hover { border-color: var(--accent); box-shadow: 0 10px 30px rgba(0, 210, 255, 0.2); transform: translateY(-10px); }
+        
+        .image-container { width: 100%; height: 230px; overflow: hidden; position: relative; }
+        .map-card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .map-card:hover img { transform: scale(1.1); }
+
+        .analysis-box { padding: 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
+        .analysis-box h3 { color: var(--accent); font-size: 1.2rem; margin-bottom: 10px; }
+        .analysis-box p { font-size: 0.9rem; line-height: 1.6; color: var(--text-gray); }
+
+        /* الخريطة التفاعلية البيضاء */
+        .interactive-map-container { width: 84%; margin: 50px auto; height: 550px; border-radius: 30px; overflow: hidden; border: 4px solid #fff; box-shadow: 0 0 50px rgba(255, 255, 255, 0.2); }
+        #map { height: 100%; width: 100%; }
+
+        /* السيرة الذاتية وتفاعل الصورة */
+        .cv-section { padding: 100px 8%; display: flex; gap: 80px; align-items: center; background: rgba(255,255,255,0.02); }
+        .cv-content { flex: 1; }
+        
+        .cv-img-container { position: relative; width: 400px; }
+        .cv-img-container img { 
+            width: 100%; border-radius: 30px; position: relative; z-index: 2;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid rgba(255,255,255,0.1);
+        }
+        .cv-img-container::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 80%; height: 20px; background: var(--accent); filter: blur(40px);
+            opacity: 0; transition: 0.5s; z-index: 1;
+        }
+        .cv-img-container:hover img { transform: translateY(-20px) scale(1.02); border-color: var(--accent); }
+        .cv-img-container:hover::after { opacity: 1; width: 90%; }
+
+        .skills-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 25px; }
+        .skill-box { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; border-right: 4px solid var(--accent); font-weight: bold; font-size: 0.9rem; }
+
+        /* الفوتر */
+        footer { background: #010205; padding: 60px 8%; border-top: 1px solid var(--accent); }
+        .footer-grid { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 40px; }
+        .qr-footer img { width: 150px; border: 4px solid #fff; border-radius: 15px; }
+        .contact-info a { color: #fff; text-decoration: none; font-size: 1.3rem; display: block; margin: 10px 0; transition: 0.3s; }
+        .contact-info a:hover { color: var(--accent); transform: translateX(-5px); }
+
+        @media (max-width: 1024px) {
+            nav { right: 50%; transform: translateX(50%); top: 10px; }
+            .cv-section { flex-direction: column-reverse; text-align: center; }
+            .cv-img-container { width: 280px; margin: 0 auto; }
+            .footer-grid { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <nav>
+        <a href="#projects" class="nav-link">المشاريع</a>
+        <a href="#cv" class="nav-link">السيرة الذاتية</a>
+        <a href="#contact" class="nav-link">تواصل معي</a>
+    </nav>
+
+    <section class="hero">
+        <h1>كريم رسلان</h1>
+        <p style="font-size: 1.6rem; letter-spacing: 6px; color: var(--accent); font-weight: 700;">GIS SPECIALIST & ANALYST</p>
+    </section>
+
+    <div id="projects">
+        <h2 class="section-title">معرض المشاريع والتحليلات المكانية</h2>
+        <section class="maps-grid">
+            <div class="map-card">
+                <div class="image-container"><img src="c:\Users\LAPTOPS HOUSE\Documents\mm\Extact by Circle.jpg"></div>
+                <div class="analysis-box">
+                    <h3>Extract by Circle</h3>
+                    <p>استقطاع مكاني لمنطقة دراسة تضاريسية في جنوب سيناء بدقة عالية باستخدام أدوات ArcGIS المتقدمة.</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="image-container"><img src="c:\Users\LAPTOPS HOUSE\Documents\mm\Extract by Attribute – Switzerland.jpg"></div>
+                <div class="analysis-box">
+                    <h3>Attribute Analysis</h3>
+                    <p>تحليل النطاقات الارتفاعية في سويسرا بناءً على السمات الجدولية للنماذج الرقمية.</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="image-container"><img src="c:\Users\LAPTOPS HOUSE\Documents\mm\Results of Sample Tool Applied to DEM of Australia.jpg"></div>
+                <div class="analysis-box">
+                    <h3>Statistical Sampling</h3>
+                    <p>استخلاص قيم الخلايا لبيانات DEM في أستراليا لأغراض التحليل الإحصائي والمكاني.</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="image-container"><img src="c:\Users\LAPTOPS HOUSE\Documents\mm\Safaja_Hydrology.jpg"></div>
+                <div class="analysis-box">
+                    <h3>Hydrology Modeling</h3>
+                    <p>نمذجة شبكات الأودية وأحواض الصرف لمدينة سفاجا لتقدير مخاطر السيول.</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="image-container"><img src="c:\Users\LAPTOPS HOUSE\Documents\mm\po.jpg"></div>
+                <div class="analysis-box">
+                    <h3>Vision 2030 Planning</h3>
+                    <p>توزيع المرافق التعليمية في محافظة عفيف لدعم التخطيط المستقبلي ورؤية المملكة.</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="image-container"><img src="c:\Users\LAPTOPS HOUSE\Documents\mm\AIRPORT.jpg"></div>
+                <div class="analysis-box">
+                    <h3>Infrastructure GIS</h3>
+                    <p>تخطيط جيو-مكاني للبنية التحتية والمنشآت الحيوية في جزيرة Giannutri الإيطالية.</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="image-container"><img src="c:\Users\LAPTOPS HOUSE\Documents\mm\Extract Vaiues To Points.jpg"></div>
+                <div class="analysis-box">
+                    <h3>Values to Points</h3>
+                    <p>ربط قيم الراستر بالمواقع النقطية لتحليل العلاقات المكانية بين التضاريس والمواقع بدقة.</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="image-container"><img src="c:\Users\LAPTOPS HOUSE\Documents\mm\Aspect & Multi-Value Raster Extraction for Ukraine.jpg"></div>
+                <div class="analysis-box">
+                    <h3>Aspect Analysis</h3>
+                    <p>تحليل اتجاهات المنحدرات الطبوغرافية واستخراج قيم الراستر المتعددة لمنطقة الدراسة في أوكرانيا.</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="image-container"><img src="c:\Users\LAPTOPS HOUSE\Documents\mm\Layout1.jpg"></div>
+                <div class="analysis-box">
+                    <h3>Land Cover 2021</h3>
+                    <p>خريطة تصنيف الغطاء الأرضي توضح التوزيع العمراني والبيئي بدقة معالجة عالية.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <h2 class="section-title">Live GIS View (Light Mode)</h2>
+    <div class="interactive-map-container">
+        <div id="map"></div>
+    </div>
+
+    <section class="cv-section" id="cv">
+        <div class="cv-img-container">
+            <img src="c:\Users\LAPTOPS HOUSE\Documents\mm\unnamed (1).jpg" alt="كريم رسلان">
+        </div>
+        <div class="cv-content">
+            <h2>السيرة الذاتية المهنية</h2>
+            <p>أخصائي نظم معلومات جغرافية من كلية الآداب بجامعة كفر الشيخ. متخصص في معالجة البيانات المكانية الضخمة وتحويلها إلى خرائط استراتيجية تدعم اتخاذ القرار.</p>
+            <div class="skills-container">
+                <div class="skill-box"><i class="fas fa-check"></i> ArcGIS Pro / Desktop</div>
+                <div class="skill-box"><i class="fas fa-check"></i> QGIS Professional</div>
+                <div class="skill-box"><i class="fas fa-check"></i> ERDAS IMAGINE</div>
+                <div class="skill-box"><i class="fas fa-check"></i> Python (ArcPy)</div>
+                <div class="skill-box"><i class="fas fa-check"></i> Remote Sensing (ENVI)</div>
+                <div class="skill-box"><i class="fas fa-check"></i> SQL & PostGIS</div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-grid">
+            <div class="contact-info">
+                <h3>تواصل معي مباشرة</h3>
+                <a href="https://wa.me/201026347035"><i class="fab fa-whatsapp"></i> +20 1026347035</a>
+                <a href="mailto:kareemraslan333@gmail.com"><i class="fas fa-envelope"></i> kareemraslan333@gmail.com</a>
+            </div>
+            <div class="qr-footer">
+                <p style="margin-bottom: 15px; font-weight: bold;">امسح الباركود للتواصل</p>
+                <img src="c:\Users\LAPTOPS HOUSE\Documents\mm\WhatsApp Image 2026-01-08 at 1.43.19 PM.jpeg" alt="QR Code">
+                <p style="font-size: 0.8rem; opacity: 0.5;">© 2026 كريم رسلان</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // خلفية جزيئات فائقة التفاعل
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 150 },
+                "color": { "value": "#00d2ff" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.6, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 120, "color": "#00d2ff", "opacity": 0.2 },
+                "move": { "enable": true, "speed": 3, "out_mode": "out" }
+            },
+            "interactivity": {
+                "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" } }
+            }
+        });
+
+        // الخريطة التفاعلية باللون الأبيض
+        var map = L.map('map').setView([26.8206, 30.8025], 6); 
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker([31.1107, 30.9388]).addTo(map).bindPopup('كريم رسلان - GIS Specialist').openPopup();
+    </script>
+</body>
+</html>
